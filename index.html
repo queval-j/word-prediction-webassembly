@@ -1,0 +1,113 @@
+<html>
+<head>
+    <title>Hello</title>
+</head>
+<body>
+    <p id="lib-loading">Initializing, please wait.</p>
+    <input type="text" id="predict-value"/><br/>
+    <p id="predict-result"></p>
+    <p id="list-of-words"></p>
+    <script src="autocomplete.js"></script>
+    <script>
+        const initDictionary = Module.cwrap('api_predict_init_dictionary', 'number', []);
+        const hasWordInDictionary = Module.cwrap('api_predict_has_word', 'number', ['number']);
+        const predictWord = Module.cwrap('api_predict_word', 'number', ['number']);
+        const getListOfWords = Module.cwrap('api_predict_get_words', 'number', []);
+        const $input = document.querySelector('#predict-value');
+        const $result = document.querySelector('#predict-result');
+        const $words = document.querySelector('#list-of-words');
+        const $appStatus = document.querySelector('#lib-loading');
+        Module.onRuntimeInitialized = function () {
+            initDictionary();
+            $appStatus.innerHTML = '-';
+            // displayListOfWords();
+            $result.innerHTML
+            $input.addEventListener('keyup', () => {
+                const res = testPredictWord($input.value);
+                $result.innerHTML = res || '';
+            });
+        };
+
+        function testHasWord() {
+            console.time("init-str");
+            const str = "Hello 2";
+            const strPtr = strToMemory(str);
+            const res = hasWordInDictionary(strPtr);
+            console.log(res);
+            console.timeEnd("init-str");
+            Module._free(strPtr);
+        }
+
+        function testPredictWord(myWord) {
+            const str = myWord;
+            const startTimer = window.performance.now();
+            const strPtr = strToMemory(str);
+            const ptrValue = predictWord(strPtr);
+            const value = readDataFromPointer(ptrValue);
+            const endTimer = window.performance.now();
+            $appStatus.innerHTML = `${endTimer - startTimer}ms`;
+            Module._free(strPtr);
+            Module._free(ptrValue);
+            return value;
+        }
+
+        function displayListOfWords() {
+            const ptrValue = getListOfWords();
+            const values = readDataFromPointer(ptrValue);
+            Module._free(ptrValue);
+            const lines = values.split('\n');
+            const buff = lines.map(line => {
+                const [word, weight] = line.split(';');
+                if (weight != undefined) {
+                    return `-  "${word}" with a weight of ${weight}`;
+                }
+                return '';
+            }).join('<br/>');
+            $words.innerHTML = 'List of words:<br/>' + buff;
+            return buff;
+        }
+
+        function readDataFromPointer(ptr) {
+            const returnData = [];
+            let i = -1;
+            let secureStop = 1024;
+            if (ptr == 0) return;
+            while (++i < secureStop) {
+                const value = Module.HEAPU8[ptr + i];
+                returnData.push(value);
+                if (value == 0) {
+                    break;
+                }
+            }
+            const txtDecoder = new TextDecoder();
+            const value = txtDecoder.decode(new Uint8Array(returnData));
+            return value;
+        }
+
+        function arrOfStringToMemory(arrayOfStrings) {
+            // const arrStrPtr = Module._malloc(arrayOfStrings.length * 1);
+            const arrStrPtr = [];
+            for (const i in arrayOfStrings) {
+                arrStrPtr[i] = strToMemory(arrayOfStrings[i]);
+            }
+            return arrStrPtr;
+        }
+
+        function strToMemory(str) {
+            const strPtr = Module._malloc((str.length + 1) * 1);
+            // const strValue = new TextEncoder("utf-8").encode(str);
+            const strValue = new Uint8Array(str.split('').map(l => l.charCodeAt()).concat(0));
+            Module.HEAPU8.set(strValue, strPtr);
+            // Module._free(strPtr);
+            return strPtr;
+        }
+
+        function freeArrayOfString(cArr) {
+            const stringPointers = cArr.stringPointers;
+            for (const key in stringPointers) {
+                Module._free(stringPointers[key]);
+            }
+        }
+    </script>
+</body>
+</html>
