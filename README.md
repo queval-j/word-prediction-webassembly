@@ -5,16 +5,18 @@ This a project mainly to test Web Assembly.
 # How to test it?
 
 To test the project, you will need:
-- Docker (to compile WASM file)
-- make
+- ```Docker``` (to compile WASM files)
+- ```make```
 
 Optional:
-- node (to generate the mydb file)
-- http-server (to start a web server quickly ```npm install -g http-server```)
+- ```node``` (to generate the mydb file)
+- ```http-server``` (to start a web server quickly ```npm install -g http-server```)
 
 # Binary
 
-To test without Web Assembly, you can simplify do ```make re && ./build/my_autocomplete```, you should get:
+To test without Web Assembly, you can simply execute: ```make re && ./build/my_autocomplete```.
+
+You should get:
 ```
 [...]
 he
