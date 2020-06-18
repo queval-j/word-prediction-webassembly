@@ -4,3 +4,7 @@
 *#
 .*#
 build/
+.vscode/
+autocomplete.data
+autocomplete.js
+autocomplete.wasm
