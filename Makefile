@@ -12,7 +12,7 @@ WASM_OUT=		autocomplete.js
 
 SRC=			src/util.c \
 				src/tree.c \
-				src/predict_file.c \
+				src/predict.c \
 				src/dictionary.c \
 				src/autocomplete.c \
 				src/wasm_interface.c

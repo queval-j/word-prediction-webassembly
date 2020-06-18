@@ -1,9 +1,11 @@
 #include <string.h>
 #include "autocomplete.h"
 
-static void             print_dictionary(void)
+static
+void                    _print_dictionary(void)
 {
-    t_dictionary    *d = get_dictionary_manager();
+    t_dictionary *d = get_dictionary_manager();
+
     printf("\nInspecting dictionary:\n");
     printf("=> Number of nodes: %d\n", d->total);
     if (d->list == NULL) {
@@ -18,14 +20,11 @@ static void             print_dictionary(void)
     }
 }
 
-void                    my_autocomplete_debug()
-{
-    print_dictionary();
-}
-
-static int              _gnl_distance(const char *str)
+static
+int              _gnl_distance(const char *str)
 {
     ssize_t i = -1;
+
     while (str[++i] && str[i] != '\n')
         ;
     
@@ -38,6 +37,7 @@ void                    my_ac_load(const char *content)
 {
     ssize_t i = 0;
     ssize_t max = 0;
+    
     if (content == NULL) {
         return;
     }
@@ -53,4 +53,9 @@ void                    my_ac_load(const char *content)
         }
         i += pos + 1;
     }
+}
+
+void                    my_autocomplete_debug()
+{
+    _print_dictionary();
 }

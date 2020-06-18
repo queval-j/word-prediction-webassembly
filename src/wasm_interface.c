@@ -8,12 +8,12 @@
 #include "./autocomplete.h"
 
 static
-char *read_file(char *path)
+char *_read_file(char *path)
 {
-    int     fd = open(path, 'r');
-    char    *content = strdup("");
-    char    buff[128];
     ssize_t len = 0;
+    int fd = open(path, 'r');
+    char *content = strdup("");
+    char buff[128];
 
     while ((len = read(fd, buff, 127)) > 0) {
         buff[len] = '\0';
@@ -30,7 +30,7 @@ char *read_file(char *path)
 
 int     api_predict_init_dictionary(void)
 {
-    char *content = read_file("dictionary.mydb");
+    char *content = _read_file("dictionary.mydb");
 
     // printf("File:\n%s\n", content);
     my_ac_load(content);
@@ -52,9 +52,9 @@ int                     api_predict_has_word(const char *word)
 
 char                    *api_predict_word(const char *term)
 {
-    t_psearch_result    *result = NULL;
-    char                *s = NULL;
-    char                *myTerm = NULL;
+    t_psearch_result *result = NULL;
+    char *s = NULL;
+    char *myTerm = NULL;
     
     if (term == NULL) {
         return NULL;
@@ -78,13 +78,13 @@ char                    *api_predict_word(const char *term)
 
 char                    *api_predict_get_words(void)
 {
-    t_dictionary        *d = get_dictionary_manager();
-    t_word_node         *word = d->list;
+    t_dictionary *d = get_dictionary_manager();
+    t_word_node *word = d->list;
 
-    char                *content = strdup("");
-    char                *a = NULL;
-    int                 size = 0;
-    int                 deep = 10;
+    char *content = strdup("");
+    char *a = NULL;
+    int size = 0;
+    int deep = 10;
 
     while (word && deep > 10)
     {

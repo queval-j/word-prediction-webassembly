@@ -2,7 +2,7 @@
 #include "./autocomplete.h"
 
 static
-void                    init_search_node(t_predict_search *node)
+void                    _init_search_node(t_predict_search *node)
 {
     node->total = 0;
     node->root = NULL;
@@ -10,9 +10,9 @@ void                    init_search_node(t_predict_search *node)
 }
 
 static
-int                    push_node(t_predict_search *searchNode, t_tree_node *treeNode)
+int                    _push_node(t_predict_search *searchNode, t_tree_node *treeNode)
 {
-    t_psearch_node      *newNode = NULL;
+    t_psearch_node *newNode = NULL;
 
     if ((newNode = (t_psearch_node*)malloc((sizeof(t_psearch_node)))) == NULL) {
         printf("Unable to allocate memory\n");
@@ -34,20 +34,21 @@ int                    push_node(t_predict_search *searchNode, t_tree_node *tree
 }
 
 static
-int                     dm_search_tree(t_predict_search *searchNode, t_tree_node *treeNode, const char *term)
+int                     _dm_search_tree(t_predict_search *searchNode, t_tree_node *treeNode, const char *term)
 {
-    t_tree_node         *n = treeNode->children;
-    int                 i = 0;
+    t_tree_node *n = treeNode->children;
+    int i = 0;
+
     while (n)
     {
         if (term[i] && n->c == term[i]) { // Found, go deeper
-            if (push_node(searchNode, n) < 0) {
+            if (_push_node(searchNode, n) < 0) {
                 return -1;
             }
             ++i;
             n = n->children;
         } else if (term[i] == '\0') { // Autopilote, go deeper
-            if (push_node(searchNode, n) < 0) {
+            if (_push_node(searchNode, n) < 0) {
                 return -1;
             }
             if (n->c == '\0') { // last node
@@ -62,9 +63,10 @@ int                     dm_search_tree(t_predict_search *searchNode, t_tree_node
 }
 
 static
-void                    clean_search(t_predict_search *searchNode)
+void                    _clean_search(t_predict_search *searchNode)
 {
-    t_psearch_node      *tmp = searchNode->root;
+    t_psearch_node *tmp = searchNode->root;
+
     while (tmp)
     {
         searchNode->root = tmp->next;
@@ -74,12 +76,12 @@ void                    clean_search(t_predict_search *searchNode)
 }
 
 static
-t_psearch_result        *dm_build_word_from_search(t_predict_search *searchNode, int termLenght)
+t_psearch_result        *_dm_build_word_from_search(t_predict_search *searchNode, int termLenght)
 {
-    char                *s = NULL;
-    int                 len = searchNode->total;
-    t_psearch_node      *tmp = searchNode->root;
-    t_psearch_result    *node = NULL;
+    char *s = NULL;
+    int len = searchNode->total;
+    t_psearch_node *tmp = searchNode->root;
+    t_psearch_result *node = NULL;
     
     if (tmp == NULL) {
         return NULL;
@@ -105,22 +107,23 @@ t_psearch_result        *dm_build_word_from_search(t_predict_search *searchNode,
 
 t_psearch_result        *dm_predict(const char *str)
 {
-    t_dictionary        *d = get_dictionary_manager();
-    t_predict_search    search;
-    t_tree_node         *n = d->root;
-    char                *term = strdup(str);
-    char                c = 0;
-    ssize_t             termLenght = strlen(term);
+    t_dictionary *d = get_dictionary_manager();
+    t_predict_search search;
+    t_tree_node *n = d->root;
+    char *term = strdup(str);
+    char c = 0;
+    ssize_t termLenght = strlen(term);
+
     term = to_lower_case(term);
     c = term[0];
-    init_search_node(&search);
+    _init_search_node(&search);
     while (n != NULL)
     {
         if (n->c == c) {
-            if (push_node(&search, n) >= 0) {
-                if (dm_search_tree(&search, n, &term[1]) >= 0) {
-                    t_psearch_result *predictedWord = dm_build_word_from_search(&search, termLenght);
-                    clean_search(&search);
+            if (_push_node(&search, n) >= 0) {
+                if (_dm_search_tree(&search, n, &term[1]) >= 0) {
+                    t_psearch_result *predictedWord = _dm_build_word_from_search(&search, termLenght);
+                    _clean_search(&search);
                     return predictedWord;
                 }
             }
@@ -128,6 +131,6 @@ t_psearch_result        *dm_predict(const char *str)
         }
         n = n->next;
     }
-    clean_search(&search);
+    _clean_search(&search);
     return NULL;
 }
