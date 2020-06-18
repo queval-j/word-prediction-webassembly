@@ -22,9 +22,9 @@ You should get:
 he
 a
 ==== Testing ====
-Does "Hello" has been found ? Yes
-Does "Hell" has been found ? No
-Does "Mom" has been found ? No
+Does "Hello" exist ? Yes
+Does "Hell" exist ? No
+Does "Mom" exist ? No
 Predict word for "Hel":
 => Predict "lo" with a weight of 20000000
 ====> Found hello

@@ -8,12 +8,14 @@
 
 #include "./autocomplete.h"
 
-char *read_file(char *path)
+static
+char *_read_file(char *path)
 {
-    int     fd = open(path, 'r');
-    char    *content = strdup("");
-    char    buff[128];
+    int fd = open(path, 'r');
+    char *content = strdup("");
+    char buff[128];
     ssize_t len = 0;
+
     while ((len = read(fd, buff, 127)) > 0) {
         buff[len] = '\0';
         char *tmp = (char*)malloc(sizeof(char) * (strlen(content) + strlen(buff) + 1));
@@ -28,9 +30,10 @@ char *read_file(char *path)
 }
 
 static
-void printPredict(const char *term)
+void _print_predict(const char *term)
 {
     t_psearch_result *result = NULL;
+
     printf("Predict word for \"%s\":\n", term);
     result = dm_predict(term);
     if (result != NULL) {
@@ -44,7 +47,8 @@ void printPredict(const char *term)
 
 int main(void)
 {
-    char *content = read_file("dictionary.mydb");
+    char *content = _read_file("dictionary.mydb");
+
     printf("File:\n%s\n", content);
     printf("=> Storing words\n");
     my_ac_load(content);
@@ -55,15 +59,15 @@ int main(void)
     dm_print_words();
     printf("==== Testing ====\n");
     int found = dm_search_word("Hello");
-    printf("Does \"Hello\" has been found ? %s\n", (found == 1 ? "Yes" : "No"));
+    printf("Does \"Hello\" exist ? %s\n", (found == 1 ? "Yes" : "No"));
     found = dm_search_word("Hell");
-    printf("Does \"Hell\" has been found ? %s\n", (found == 1 ? "Yes" : "No"));
+    printf("Does \"Hell\" exist ? %s\n", (found == 1 ? "Yes" : "No"));
     found = dm_search_word("Mom");
-    printf("Does \"Mom\" has been found ? %s\n", (found == 1 ? "Yes" : "No"));
+    printf("Does \"Mom\" exist ? %s\n", (found == 1 ? "Yes" : "No"));
     // predict test
-    printPredict("Hel");
-    printPredict("Lok");
-    printPredict("Nothing");
-    printPredict("examine");
+    _print_predict("Hel");
+    _print_predict("Lok");
+    _print_predict("Nothing");
+    _print_predict("examine");
     return 0;
 }

@@ -2,9 +2,10 @@
 
 #include "autocomplete.h"
 
-t_dictionary *get_dictionary_manager(void)
+t_dictionary                *get_dictionary_manager(void)
 {
     static t_dictionary *dictionary = NULL;
+    
     if (dictionary == NULL) {
         dictionary = malloc(sizeof(t_dictionary));
         // TODO: check if malloc value
@@ -16,10 +17,11 @@ t_dictionary *get_dictionary_manager(void)
 }
 
 static
-void _get_word_size(int *length, int *index, const char *str)
-{
+void                        _get_word_size(int *length, int *index, const char *str)
+    {
     int i = -1;
     char buff[5];
+
     while (str[++i] >= '0' && str[i] <= '9' && i < 4)
     {
         buff[i] = str[i];
@@ -30,7 +32,7 @@ void _get_word_size(int *length, int *index, const char *str)
 }
 
 static
-t_word_node *_create_node_from_line(const char *str)
+t_word_node                 *_create_node_from_line(const char *str)
 {
     int len = -1;
     int i = 0;
@@ -56,10 +58,11 @@ t_word_node *_create_node_from_line(const char *str)
     return NULL;
 }
 
-void dm_push_text(const char *str)
+void                        dm_push_text(const char *str)
 {
     t_dictionary *d = get_dictionary_manager();
     t_word_node *node = _create_node_from_line(str);
+
     if (node == NULL) {
         printf("[ERROR]\"%s\" has been skipped\n", str);
         return;
@@ -72,10 +75,11 @@ void dm_push_text(const char *str)
     }
 }
 
-void dm_print_words(void)
+void                            dm_print_words(void)
 {
     t_dictionary *d = get_dictionary_manager();
     t_word_node *node = d->list;
+
     printf("=== Words loaded ====\n");
     while (node)
     {
