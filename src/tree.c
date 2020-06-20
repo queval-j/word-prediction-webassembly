@@ -64,18 +64,17 @@ void                    _push_node(t_dictionary *d, t_word_node *wordNode, t_tre
     if (tmp == NULL) {
         node = _create_node(wordNode->weight, c, parent);
         parent->children = node;
-        if (c != '\0') {
-            _push_node(d, wordNode, node, &str[1]);
-            return;
-        }
-        return;
+        tmp = node;
     }
     while (tmp)
     {
         if (tmp->c == c) {
+            if (tmp->weight < wordNode->weight) {
+                tmp->weight = wordNode->weight;
+            }
             if (c != '\0') {
                 _push_node(d, wordNode, tmp, &str[1]);
-                _node_sort_children_by_weight(tmp);
+                // _node_sort_children_by_weight(tmp);
             }
             return;
         }
@@ -102,28 +101,26 @@ void                    _push_word(t_dictionary *d, t_word_node *wordNode)
     if (tmp == NULL) {
         node = _create_node(wordNode->weight, c, NULL);
         d->root = node;
-        d->total += 1;
-        _push_node(d, wordNode, node, &wordNode->word[1]);
-    } else {
-        while (tmp)
-        {
-            if (tmp->c == c) {
-                d->total += 1;
-                if (tmp->weight < wordNode->weight) {
-                    tmp->weight = wordNode->weight;
-                }
-                _push_node(d, wordNode, tmp, &wordNode->word[1]);
-                return;
+        tmp = d->root;
+    }
+    while (tmp)
+    {
+        if (tmp->c == c) {
+            d->total += 1;
+            if (tmp->weight < wordNode->weight) {
+                tmp->weight = wordNode->weight;
             }
-            else if (tmp->next == NULL) {
-                node = _create_node(wordNode->weight, c, NULL);
-                tmp->next = node;
-                d->total += 1;
-                _push_node(d, wordNode, node, &wordNode->word[1]);
-                return;
-            }
-            tmp = tmp->next;
+            _push_node(d, wordNode, tmp, &wordNode->word[1]);
+            return;
         }
+        else if (tmp->next == NULL) {
+            node = _create_node(wordNode->weight, c, NULL);
+            tmp->next = node;
+            d->total += 1;
+            _push_node(d, wordNode, node, &wordNode->word[1]);
+            return;
+        }
+        tmp = tmp->next;
     }
 }
 

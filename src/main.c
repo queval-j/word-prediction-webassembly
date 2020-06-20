@@ -68,6 +68,6 @@ int main(void)
     _print_predict("Hel");
     _print_predict("Lok");
     _print_predict("Nothing");
-    _print_predict("examine");
+    _print_predict("Examin");
     return 0;
 }
